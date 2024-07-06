@@ -1,6 +1,6 @@
 <?php
 
-use App\Events\MqttSubscribeEvent;
+use App\Http\Controllers\MainController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -9,14 +9,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Route::get('/mqtt', function () {
-
-//     event(new MqttSubscribeEvent);
-
-//     return 'done';
-// });
-
-Route::get('/dashboard', [DashboardController::class, 'dashboard']);
+Route::get('/dashboard', [MainController::class, 'dashboard'])->name('main.dashboard');
+Route::get('/tabel-ph', [MainController::class, 'tabelPH'])->name('main.tabelPH');
 
 // Route::get('/dashboard', function () {
 //     return view('dashboard');
