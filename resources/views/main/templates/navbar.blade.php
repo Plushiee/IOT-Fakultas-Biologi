@@ -13,7 +13,7 @@
 <div id="sidebar-wrapper">
     <ul class="sidebar-nav">
         <li class="sidebar-brand">
-            <a href="#">
+            <a href="https://www.ukdw.ac.id/akademik/fakultas-bioteknologi/">
                 <img src="{{ asset('main/img/LOGO-FAK-BIOTEK.png') }}" class="logo img-fluid" alt="LOGO-BIOTEK.png">
             </a>
         </li>
@@ -24,7 +24,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="{{ request()->routeIs('main.tabelTDS') ? 'active' : '' }}">
+            <a href="{{ route('main.tabelTDS') }}" class="{{ request()->routeIs('main.tabelTDS') ? 'active' : '' }}">
                 Tabel TDS <i class="bi bi-table float-end me-4"></i>
             </a>
         </li>
@@ -34,10 +34,13 @@
             </a>
         </li>
         <li>
-            <a href="#" class="{{ request()->routeIs('main.tabelUdara') ? 'active' : '' }}">Tabel Udara<i class="bi bi-table float-end me-4"></i></a>
+            <a href="{{ route('main.tabelUdara') }}"
+                class="{{ request()->routeIs('main.tabelUdara') ? 'active' : '' }}">Tabel Udara<i
+                    class="bi bi-table float-end me-4"></i></a>
         </li>
         <li>
-            <a href="#" class="{{ request()->routeIs('main.tabelArus') ? 'active' : '' }}">Tabel Arus Air <i class="bi bi-table float-end me-4"></i></a>
+            <a href="{{ route('main.tabelArus') }}" class="{{ request()->routeIs('main.tabelArus') ? 'active' : '' }}">Tabel Arus Air <i
+                    class="bi bi-table float-end me-4"></i></a>
         </li>
     </ul>
 </div>

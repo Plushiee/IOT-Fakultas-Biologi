@@ -15,4 +15,16 @@ class MainController extends Controller
     {
         return view('main.tabelPH');
     }
+    public function tabelTDS()
+    {
+        return view('main.tabelTDS');
+    }
+    public function tabelUdara()
+    {
+        return view('main.tabelUdara');
+    }
+    public function tabelArus()
+    {
+        return view('main.tabelArusAir');
+    }
 }

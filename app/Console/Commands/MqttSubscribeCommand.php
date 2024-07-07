@@ -5,12 +5,20 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use PhpMqtt\Client\Facades\MQTT;
 use App\Events\MqttSubscribeEvent;
+use App\Models\TabelArusAirModel;
+use App\Models\TabelPHModel;
+use App\Models\TabelTDSModel;
+use App\Models\TabelTempHumModel;
 
 class MqttSubscribeCommand extends Command
 {
     // Definisikan nama dan deskripsi command
     protected $signature = 'mqtt:subscribe';
     protected $description = 'Subscribe to MQTT topics and handle incoming messages';
+    protected $tempHumData = [
+        'temperature' => null,
+        'humidity' => null,
+    ];
 
     public function __construct()
     {
@@ -40,6 +48,10 @@ class MqttSubscribeCommand extends Command
         foreach ($topics as $topic) {
             $mqtt->subscribe($topic, function (string $topic, string $message) {
                 echo sprintf("Received message on topic [%s]: %s\n", $topic, $message);
+
+                // Parse the message and save to database
+                $this->handleMessage($topic, $message);
+
                 // Dispatch event with received message and topic
                 event(new MqttSubscribeEvent($message, $topic));
             }, 0);
@@ -49,5 +61,47 @@ class MqttSubscribeCommand extends Command
 
         return 0;
     }
-}
 
+    protected function handleMessage($topic, $message)
+    {
+        switch ($topic) {
+            case 'fakbiologi/waterflow':
+                TabelArusAirModel::create(['id_area' => 1, 'debit' => $message]);
+                break;
+            case 'fakbiologi/TDS':
+                TabelTDSModel::create(['id_area' => 1, 'ppm' => $message]);
+                break;
+            case 'fakbiologi/PH':
+                TabelPHModel::create(['id_area' => 1, 'ph' => $message]);
+                break;
+            case 'fakbiologi/humidityDHT':
+                $this->tempHumData['humidity'] = $message;
+                $this->storeTempHumData();
+                break;
+            case 'fakbiologi/temperatureDHT':
+                $this->tempHumData['temperature'] = $message;
+                $this->storeTempHumData();
+                break;
+                // Tambahkan case untuk topik lain jika diperlukan
+            default:
+                // Logika default jika topik tidak dikenali
+                break;
+        }
+    }
+
+    // Function to store temperature and humidity data if both are available
+    protected function storeTempHumData()
+    {
+        if ($this->tempHumData['temperature'] !== null && $this->tempHumData['humidity'] !== null) {
+            TabelTempHumModel::create([
+                'id_area' => 1,
+                'temperature' => $this->tempHumData['temperature'],
+                'humidity' => $this->tempHumData['humidity']
+            ]);
+
+            // Reset data after saving
+            $this->tempHumData['temperature'] = null;
+            $this->tempHumData['humidity'] = null;
+        }
+    }
+}

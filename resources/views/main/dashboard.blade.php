@@ -133,7 +133,7 @@
                                 <div class="container-fluid d-flex justify-content-center align-items-center"
                                     style="height: 300px;">
                                     <div class="text-center">
-                                        <p class="card-text mb-2">Kecepatan Air</p>
+                                        <p class="card-text mb-2">Debit Air</p>
                                         <div id="canvas-holder" style="width:100%">
                                             <canvas class="small-chart" id="chart"></canvas>
                                         </div>
@@ -451,7 +451,7 @@
                 labels: ['Mati', 'Cukup', 'Bagus'],
                 datasets: [{
                     data: [0, 250, 500, 750, 1000],
-                    value: 900,
+                    value: 0,
                     backgroundColor: ['red', 'red', 'orange', 'yellow', 'green'],
                     borderWidth: 2
                 }]
