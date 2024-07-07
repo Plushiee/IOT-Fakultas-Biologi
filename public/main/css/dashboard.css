@@ -118,30 +118,32 @@ input[type=number] {
 
 .custom-height {
     height: 30px;
-    /* Atur tinggi sesuai kebutuhan Anda */
     padding: 5px;
-    /* Sesuaikan padding jika perlu */
     font-size: 14px;
-    /* Sesuaikan ukuran font jika perlu */
     width: auto;
-    /* Atur lebar jika perlu */
 }
 
 #btn-plus,
 #btn-minus {
     height: 30px;
     width: 15px;
-    /* Sesuaikan lebar tombol */
-    /* margin: 0; */
-    /* Sesuaikan margin jika perlu */
 }
 
 i.fa-plus-circle,
 i.fa-minus-circle {
-    /* Sesuaikan lebar tombol */
     margin: 0;
-    /* Sesuaikan margin jika perlu */
     display: flex;
     justify-content: center;
     align-items: center;
 }
+
+.green-shadow {
+    color: green;
+    text-shadow: 0 0 10px green;
+}
+
+.red-shadow {
+    color: red;
+    text-shadow: 0 0 10px red;
+}
+

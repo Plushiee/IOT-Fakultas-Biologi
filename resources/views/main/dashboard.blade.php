@@ -19,7 +19,7 @@
                 <div class="carousel-item active">
                     <div class="row">
                         <div class="col-6">
-                            <div class="card card-carousel">
+                            <div class="card card-carousel rounded">
                                 <div class="card-body card-body-carousel">
                                     <h5 class="card-title mb-3 text-center text-sm-start">Waktu</h5>
                                     <div class="text-center">
@@ -31,7 +31,7 @@
                             </div>
                         </div>
                         <div class="col-6 pe-4">
-                            <div class="card card-carousel">
+                            <div class="card card-carousel rounded">
                                 <div class="card-body card-body-carousel">
                                     <h5 class="card-title mb-3">Cuaca</h5>
                                     <div id="weather-info" class="d-flex align-items-center text-center">
@@ -49,7 +49,7 @@
                 <div class="carousel-item">
                     <div class="row">
                         <div class="col-6">
-                            <div class="card card-carousel">
+                            <div class="card card-carousel rounded">
                                 <div class="card-body card-body-carousel">
                                     <h5 class="card-title mb-3">Udara</h5>
                                     <div class="text-center my-2">
@@ -59,7 +59,7 @@
                             </div>
                         </div>
                         <div class="col-6 pe-4">
-                            <div class="card card-carousel">
+                            <div class="card card-carousel rounded">
                                 <div class="card-body card-body-carousel">
                                     <h5 class="card-title mb-3">PH</h5>
                                     <div class="text-center my-4">
@@ -75,7 +75,7 @@
                 <div class="carousel-item">
                     <div class="row">
                         <div class="col-6">
-                            <div class="card card-carousel">
+                            <div class="card card-carousel rounded">
                                 <div class="card-body card-body-carousel">
                                     <h5 class="card-title mb-3">Volume</h5>
                                     <div class="text-center my-4">
@@ -87,7 +87,7 @@
                         </div>
 
                         <div class="col-6 pe-4">
-                            <div class="card card-carousel">
+                            <div class="card card-carousel rounded">
                                 <div class="card-body card-body-carousel">
                                     <h5 class="card-title mb-3">TDS</h5>
                                     <div class="text-center my-4">
@@ -175,14 +175,14 @@
                         </div>
                     </div>
                     <div class="row align-items-center" id="temperature-control">
-                        <div class="col-6 col-sm-7 col-md-9 col-lg-8 col-xl-9">
+                        <div class="col-6 col-sm-7 col-md-9 col-lg-8 col-xl-6">
                             <div class="container-fluid">
                                 <p class="card-text text-start">Suhu Menyala</p>
                             </div>
                         </div>
-                        <div class="col-6 col-sm-5 col-md-3 col-lg-4 col-xl-3">
+                        <div class="col-6 col-sm-5 col-md-3 col-lg-4 col-xl-6">
                             <div class="container-fluid">
-                                <div class="input-group custom-height p-0">
+                                <div class="input-group custom-height p-0 mx-2">
                                     <button class="btn btn-outline-secondary" type="button" id="btn-minus">
                                         <i class="fa fa-minus-circle"></i>
                                     </button>
@@ -195,6 +195,23 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="row align-items-center mt-1" id="status-pompa">
+                        <div class="col-6 col-sm-7 col-md-9 col-lg-8 col-xl-4 col-xxl-8">
+                            <div class="container-fluid">
+                                <p class="card-text text-start">Status Pompa</p>
+                            </div>
+                        </div>
+                        <div class="col-6 col-sm-5 col-md-3 col-lg-4 col-xl-8 col-xxl-4 ps-0">
+                            <div class="container-fluid">
+                                <p class="card-text text-end mx-2 fw-bold" id="pump-status-text">
+                                    Mati&nbsp;&nbsp; <i class="fa fa-circle red-shadow" aria-hidden="true"
+                                        id="pump-status-icon"></i>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row align-items-center" id="pump-control">
                         <div class="col-8">
                             <div class="container-fluid">
@@ -268,15 +285,15 @@
                         first = false;
                     }
                     $('#pump-control').slideUp();
-                    $('#temperature-control').slideDown();
+                    $('#temperature-control, #status-pompa').slideDown();
                 } else {
                     $('#pump-control').slideDown();
-                    $('#temperature-control').slideUp();
+                    $('#temperature-control, #status-pompa').slideUp();
 
                 }
 
                 if ($('#pump-switch').is(':checked')) {
-                    $('#temperature-control').slideUp();
+                    $('#temperature-control, #status-pompa').slideUp();
                     $('#automatic-switch').prop('disabled', true);
                 } else {
                     $('#automatic-switch').prop('disabled', false);
@@ -284,7 +301,7 @@
             }
 
             // Initial state with a delay to allow elements to render properly before applying effects
-            $('#temperature-control').hide();
+            $('#temperature-control, #status-pompa').hide();
             setTimeout(updateVisibility, 100);
 
             $('#automatic-switch').change(function() {
@@ -334,18 +351,35 @@
                 }
             });
 
+            function updatePumpStatus(status) {
+                const statusTextElement = $('#pump-status-text');
+                const statusIconElement = $('#pump-status-icon');
+
+                if (status === 'nyala') {
+                    statusTextElement.html(
+                        'Menyala&nbsp;&nbsp; <i class="fa fa-circle green-shadow" aria-hidden="true" id="pump-status-icon"></i>'
+                        );
+                } else if (status === 'mati') {
+                    statusTextElement.html(
+                        'Mati&nbsp;&nbsp; <i class="fa fa-circle red-shadow" aria-hidden="true" id="pump-status-icon"></i>'
+                        );
+                }
+            }
+
             function checkTemperature() {
                 if (isAutomatic) {
                     const temperature = parseFloat($('#temperature-input').val());
                     if (temperature < temperatureThreshold && pumpStatus !== 'nyala') {
                         sendMqttMessage('fakbiologi/pump', 'nyala');
                         pumpStatus = 'nyala';
+                        updatePumpStatus(pumpStatus);
                     } else if (temperature >= temperatureThreshold && pumpStatus !== 'mati') {
                         sendMqttMessage('fakbiologi/pump', 'mati');
                         pumpStatus = 'mati';
+                        updatePumpStatus(pumpStatus);
                     }
-                    // Cek setiap 5 detik
-                    setTimeout(checkTemperature, 5000);
+                    // Cek setiap 2 detik
+                    setTimeout(checkTemperature, 2000);
                 }
             }
 
