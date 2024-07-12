@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use PhpMqtt\Client\Facades\MQTT;
 use App\Models\TabelPHModel;
+use App\Models\TabelPompaModel;
 use App\Models\TabelTDSModel;
 use App\Models\TabelTempHumModel;
 
@@ -139,6 +140,25 @@ class ApiController extends Controller
         ];
 
         return response()->json($formattedData);
+    }
+
+    public function postPompa(Request $request)
+    {
+        $request->validate([
+            'status' => 'required|in:nyala,mati'
+        ]);
+
+        $pompa = new TabelPompaModel();
+        $pompa->id_area = (1);
+        $pompa->status = $request->input('status');
+        if ($request->has('suhu')) {
+            $pompa->suhu = $request->input('suhu');
+        } else {
+            $pompa->suhu = null;
+        }
+        $pompa->save();
+
+        return response()->json(['success' => 'Status pompa berhasil diubah!']);
     }
 
     private function validDate($date)

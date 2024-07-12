@@ -169,7 +169,7 @@
                             <div class="container-fluid">
                                 <div class="form-check form-switch float-end">
                                     <input class="form-check-input" type="checkbox" role="switch"
-                                        id="automatic-switch">
+                                        id="automatic-switch" {{ $pompaStatus->otomatis ? 'checked' : '' }}>
                                 </div>
                             </div>
                         </div>
@@ -186,7 +186,7 @@
                                     <button class="btn btn-outline-secondary" type="button" id="btn-minus">
                                         <i class="fa fa-minus-circle"></i>
                                     </button>
-                                    <input type="number" class="form-control custom-height" value="5"
+                                    <input type="number" class="form-control custom-height" value="{{ $pompaStatus->suhu }}"
                                         min="0" max="100" step="1" id="temperature-input">
                                     <button class="btn btn-outline-secondary" type="button" id="btn-plus">
                                         <i class="fa fa-plus-circle"></i>
@@ -221,7 +221,8 @@
                         <div class="col-4 text-end">
                             <div class="container-fluid">
                                 <div class="form-check form-switch float-end">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="pump-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="pump-switch"
+                                        @if ($pompaStatus->status == 'nyala' && $pompaStatus->otomatis == false) checked @endif>
                                 </div>
                             </div>
                         </div>
@@ -338,12 +339,14 @@
             $('#pump-switch').change(function() {
                 if (this.checked) {
                     sendMqttMessage('fakbiologi/pump', 'nyala');
+                    sendPompaStatus('nyala');
                     alert.fire({
                         icon: 'success',
                         title: 'Pompa Dinyalakan!'
                     });
                 } else {
                     sendMqttMessage('fakbiologi/pump', 'mati');
+                    sendPompaStatus('mati');
                     alert.fire({
                         icon: 'warning',
                         title: 'Pompa Dimatikan!'
@@ -358,11 +361,11 @@
                 if (status === 'nyala') {
                     statusTextElement.html(
                         'Menyala&nbsp;&nbsp; <i class="fa fa-circle green-shadow" aria-hidden="true" id="pump-status-icon"></i>'
-                        );
+                    );
                 } else if (status === 'mati') {
                     statusTextElement.html(
                         'Mati&nbsp;&nbsp; <i class="fa fa-circle red-shadow" aria-hidden="true" id="pump-status-icon"></i>'
-                        );
+                    );
                 }
             }
 
@@ -371,16 +374,36 @@
                     const temperature = parseFloat($('#temperature-input').val());
                     if (temperature < temperatureThreshold && pumpStatus !== 'nyala') {
                         sendMqttMessage('fakbiologi/pump', 'nyala');
+                        sendPompaStatus('nyala');
                         pumpStatus = 'nyala';
                         updatePumpStatus(pumpStatus);
                     } else if (temperature >= temperatureThreshold && pumpStatus !== 'mati') {
                         sendMqttMessage('fakbiologi/pump', 'mati');
+                        sendPompaStatus('mati');
                         pumpStatus = 'mati';
                         updatePumpStatus(pumpStatus);
                     }
                     // Cek setiap 2 detik
                     setTimeout(checkTemperature, 2000);
                 }
+            }
+
+            // Function Send Pompa to Database
+            function sendPompaStatus(status) {
+                $.ajax({
+                    url: '{{ route('api.post.pompa') }}',
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        status: status
+                    },
+                    error: function(response) {
+                        alert.fire({
+                            icon: 'error',
+                            title: 'Gagal mengirim perintah ke API!'
+                        });
+                    }
+                });
             }
 
             // MQTT Send to API
@@ -395,7 +418,7 @@
                     },
                     error: function(response) {
                         alert.fire({
-                            icon: 'success',
+                            icon: 'error',
                             title: 'Gagal mengirim perintah ke MQTT!'
                         });
                     }
